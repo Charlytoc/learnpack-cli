@@ -57,6 +57,23 @@ const getGitpodAddress = () => {
   return "http://localhost";
 };
 
+const getCodespacesNamespace = () => {
+  // https://orange-rotary-phone-wxpg49q5gcg4rp-3000.app.github.dev
+  const codespace_name = shell
+    .exec("echo $CODESPACE_NAME", { silent: true })
+    .stdout.replace(/(\r\n|\n|\r)/gm, "");
+
+  if (
+    !codespace_name ||
+    codespace_name === "" ||
+    codespace_name === undefined
+  ) {
+    return null;
+  }
+
+  return codespace_name;
+};
+
 export default async ({
   grading,
   mode,
@@ -124,12 +141,17 @@ export default async ({
   });
 
   // auto detect agent (if possible)
+  const codespaces_workspace = getCodespacesNamespace();
   if (shell.which("gp") && configObj && configObj.config) {
     configObj.config.editor.agent = "vscode";
     configObj.address = getGitpodAddress();
     configObj.config.publicUrl = `https://${
       configObj.config.port
     }-${configObj.address?.slice(8)}`;
+  } else if (configObj.config && codespaces_workspace) {
+    configObj.config.editor.agent = "vscode";
+    configObj.address = `https://${codespaces_workspace}.github.dev`;
+    configObj.config.publicUrl = `https://${codespaces_workspace}-${configObj.config.port}.app.github.dev`;
   } else if (configObj.config && !configObj.config.editor.agent) {
     configObj.config.editor.agent = "localhost";
   }
