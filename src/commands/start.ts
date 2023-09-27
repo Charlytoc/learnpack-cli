@@ -173,7 +173,7 @@ export default class StartCommand extends SessionCommand {
         });
 
         /*
-        socket.on("ai-feedback", async (data: IExerciseData) => {
+        socket.on("generate", async (data: IExerciseData) => {
           const exercise = this.configManager?.getExercise(data.exerciseSlug);
 
           if (!exercise?.language) {
