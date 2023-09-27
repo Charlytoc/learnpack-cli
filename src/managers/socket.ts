@@ -14,7 +14,7 @@ const SocketManager: ISocket = {
   socket: null,
   config: null,
   allowedActions: [],
-  possibleActions: ['build', 'reset', 'test', 'tutorial'],
+  possibleActions: ['build', 'reset', 'test', 'tutorial', 'generate'],
   isTestingEnvironment: false,
   actionCallBacks: {
     clean: (_, s: { logs: Array<string> }) => {
@@ -225,6 +225,18 @@ const SocketManager: ISocket = {
       })
     }
   },
+  // complete: function (type: TSuccessType, stdout: string) {
+  // TODO: implemente complete function, this is code from the test function and its not ideal
+  //   const types = ['compiler', 'testing', 'generating']
+  //   if (!types.includes(type))
+  //     this.fatal(`Invalid socket success type "${type}" on socket`)
+  //   else if (stdout === '')
+  //     this.log((type + '-success') as TSuccessType, [
+  //       'No stdout to display on the console',
+  //     ])
+  //   else
+  //     this.log((type + '-success') as TSuccessType, [stdout])
+  // },
   fatal: function (msg: string) {
     this.log('internal-error', [msg])
     throw msg
