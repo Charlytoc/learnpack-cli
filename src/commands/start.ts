@@ -172,6 +172,27 @@ export default class StartCommand extends SessionCommand {
           });
         });
 
+        // socket.on("ai-feedback", async (data: IExerciseData) => {
+        //   const exercise = this.configManager?.getExercise(data.exerciseSlug);
+
+        //   if (!exercise?.language) {
+        //     socket.error(
+        //       "compiler-error",
+        //       "Impossible to detect language to build for " +
+        //         data.exerciseSlug +
+        //         "..."
+        //     );
+        //     return;
+        //   }
+
+        //   socket.log(
+        //     "generating_feedback",
+        //     "Looking for feedback from AI engine"
+        //   );
+
+        //   // TODO: get feedback from rigotobot or 4geeks.com
+        // });
+
         socket.on("test", async (data: IExerciseData) => {
           const exercise = this.configManager?.getExercise(data.exerciseSlug);
 
