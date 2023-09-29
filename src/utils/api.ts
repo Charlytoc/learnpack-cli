@@ -1,7 +1,7 @@
 import Console from "../utils/console";
 import * as storage from "node-persist";
 import cli from "cli-ux";
-const HOST = "https://learnpack.herokuapp.com";
+const HOST = "https://breathecode.herokuapp.com";
 
 // eslint-disable-next-line
 const _fetch = require("node-fetch");
@@ -19,6 +19,7 @@ interface IOptions {
 
 const fetch = async (url: string, options: IOptions = {}) => {
   const headers: IHeaders = { "Content-Type": "application/json" };
+  Console.log(`Fetching ${url}`);
   let session = null;
   try {
     session = await storage.getItem("bc-payload");
@@ -64,13 +65,20 @@ throw APIError("Uknown error");
 
 const login = async (identification: string, password: string) => {
   try {
-    cli.action.start("Looking for credentials...");
+    cli.action.start(`Looking for credentials with ${identification}`);
+    cli.action.start(`Looking for credentials with password ${password}`);
     await cli.wait(1000);
-    const data = await fetch(`${HOST}/v1/auth/token/`, {
-      body: JSON.stringify({ identification, password }),
+    const url = `${HOST}/v1/auth/login/`;
+    // Console.log(url);
+    const data = await fetch(url, {
+      body: JSON.stringify({
+        email: identification,
+        password: password,
+      }),
       method: "post",
     });
     cli.action.stop("ready");
+    // cli.log(data);
     return data;
   } catch (error) {
     Console.error((error as TypeError).message);

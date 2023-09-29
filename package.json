@@ -3,6 +3,7 @@
   "description": "Create, sell or download and take learning amazing learning packages",
   "version": "2.1.25",
   "author": "Alejandro Sanchez @alesanchezr",
+
   "bin": {
     "learnpack": "bin/run"
   },
