@@ -239,6 +239,16 @@ export default async function (
     })
   );
 
+  /*
+  app.post(
+    "/exercise/:slug/file/:fileName",
+    withHandler((req: express.Request, res: express.Response) => {
+      get tokens but also, add allowed action for 'generate'
+      use the sessionManager to keep compatibility with the cli login command.
+    })
+  );
+  */
+
   const textBodyParser = bodyParser.text();
   app.put(
     "/exercise/:slug/file/:fileName",
