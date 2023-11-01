@@ -3,7 +3,6 @@
   "description": "Create, sell or download and take learning amazing learning packages",
   "version": "2.1.25",
   "author": "Alejandro Sanchez @alesanchezr",
-
   "bin": {
     "learnpack": "bin/run"
   },
@@ -11,6 +10,7 @@
     "url": "https://github.com/learnpack/learnpack-cli/issues"
   },
   "dependencies": {
+    "@learnpack/python": "^1.0.0",
     "@oclif/command": "^1.6.1",
     "@oclif/config": "^1.15.1",
     "@oclif/plugin-help": "^3.1.0",
@@ -68,6 +68,7 @@
     "fs-extra": "^10.0.1",
     "globby": "^10.0.2",
     "husky": ">=6",
+    "learnpack-node": "^0.0.21",
     "lint-staged": ">=10",
     "mocha": "^5.2.0",
     "mock-fs": "^5.1.2",

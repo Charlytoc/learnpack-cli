@@ -1,4 +1,4 @@
-import {IConfig, IConfigObj} from './config'
+import { IConfig, IConfigObj } from "./config";
 
 export interface IPayload {
   email: string;
@@ -20,7 +20,8 @@ export interface ISession {
   isActive: () => boolean;
   get: (config?: IConfigObj) => Promise<any>;
   login: () => Promise<void>;
+  loginWeb: (email: string, password: string) => Promise<void>;
   sync: () => Promise<void>;
-  start: ({token, payload}: IStartProps) => Promise<void>;
+  start: ({ token, payload }: IStartProps) => Promise<void>;
   destroy: () => Promise<void>;
 }

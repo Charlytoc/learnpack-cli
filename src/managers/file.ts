@@ -166,4 +166,13 @@ export const rmSync = function (path: string) {
   }
 };
 
+export const checkIfDirectoryExists = (path: string) => {
+  const fs = require("fs");
+  if (fs.existsSync(path)) {
+    return true;
+  }
+
+  return false;
+};
+
 export default { download, decompress, downloadEditor, clone, rmSync };

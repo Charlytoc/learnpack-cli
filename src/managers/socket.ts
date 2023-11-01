@@ -92,10 +92,9 @@ actions = [actions];
           "compiler",
           ({ action, data }: { action: string; data: IExerciseData }) => {
             this.emit("clean", "pending", ["Working..."]);
-            // Console.log(data.exerciseSlug)
             if (typeof data.exerciseSlug === "undefined") {
               this.log("internal-error", ["No exercise slug specified"]);
-              Console.error("No exercise slug especifiedss");
+              Console.error("No exercise slug especified");
               return;
             }
 
@@ -123,8 +122,12 @@ actions = [actions];
   ask: function (questions = []) {
     return new Promise((resolve, _) => {
       this.emit("ask", "pending", ["Waiting for input..."], questions);
+      console.log("Setting up listeners");
       this.on("input", ({ inputs }: any) => {
         // Workaround to fix issue because null inputs
+
+        console.log("inputs", inputs);
+
         let isNull = false;
         // eslint-disable-next-line
         inputs.forEach((input: any) => {
@@ -231,18 +234,10 @@ this.log((type + "-success") as TSuccessType, [stdout]);
       });
     }
   },
-  // complete: function (type: TSuccessType, stdout: string) {
-  // TODO: implemente complete function, this is code from the test function and its not ideal
-  //   const types = ['compiler', 'testing', 'generating']
-  //   if (!types.includes(type))
-  //     this.fatal(`Invalid socket success type "${type}" on socket`)
-  //   else if (stdout === '')
-  //     this.log((type + '-success') as TSuccessType, [
-  //       'No stdout to display on the console',
-  //     ])
-  //   else
-  //     this.log((type + '-success') as TSuccessType, [stdout])
-  // },
+  complete: function () {
+    console.log("complete");
+  },
+
   fatal: function (msg: string) {
     this.log("internal-error", [msg]);
     throw msg;

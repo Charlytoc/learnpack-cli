@@ -28,6 +28,7 @@ export interface ISocket {
   start: (config: IConfig, server: any, isTestingEnvironment: boolean) => void;
   on: (action: any, callBack: any) => void;
   clean: (_: string, logs: Array<any>) => void;
+  complete: () => void;
   ask: (questions: Array<string>) => void;
   reload: (files: Array<string> | null, exercises: Array<string>) => void;
   openWindow: (id: string) => void;

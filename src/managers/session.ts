@@ -92,6 +92,17 @@ const Session: ISession = {
       this.start({ token: data.token, payload: data });
     }
   },
+  loginWeb: async function (email, password) {
+    if (!v.isEmail(email)) {
+      throw ValidationError("Invalid email");
+    }
+
+    const data = await api.login(email, password);
+    if (data) {
+      this.start({ token: data.token, payload: data });
+      return data;
+    }
+  },
   sync: async function () {
     const payload = await this.getPayload();
     if (payload) {
