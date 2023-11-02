@@ -10,6 +10,7 @@ import { IFile } from "../../models/file";
 import { IConfigObj, TEntries } from "../../models/config";
 import { IConfigManager } from "../../models/config-manager";
 import { IExercise } from "../../models/exercise-obj";
+import SessionManager from "../../managers/session";
 
 const withHandler =
   (func: (req: express.Request, res: express.Response) => void) =>
@@ -37,6 +38,7 @@ export default async function (
   configManager: IConfigManager
 ) {
   const { config, exercises } = configObject;
+  const session = await SessionManager.get(configManager?.get());
 
   const dispatcher = queue.dispatcher({
     create: true,
@@ -49,20 +51,39 @@ export default async function (
     })
   );
 
-  /**
-     * TODO: replicate a socket action, the request payload must be passed to the socket as well
-  
-   const jsonBodyParser = bodyParser.json()
-   
-   type ISocketActions = "addAllowed" | "removeAllowed" | "start" | "on" | "clean" | "ask" | "reload" | "openWindow" | "log" | "emit" | "ready" | "error" | "fatal" | "success" | "onTestingFinished";
-   
-   app.post('/socket/:actionName', jsonBodyParser, withHandler((req, res) => {
-     if (socket[req.params.actionName as ISocketActions] instanceof Function) {
-       socket[req.params.actionName as ISocketActions](req.body ? req.body.data : null)
-       res.json({ "details": "Socket call executed sucessfully" })
-      } else res.status(400).json({ "details": `Socket action ${req.params.actionName} not found` })
-    }))
-  */
+  // Added this line to parse the json body
+
+  const jsonBodyParser = bodyParser.json();
+  // Trying to log in from frontend
+  app.post(
+    "/login",
+    jsonBodyParser,
+    withHandler(async (req: express.Request, res: express.Response) => {
+      const email = req.body.email;
+      const password = req.body.password;
+
+      SessionManager.destroy();
+      const payload = await SessionManager.loginWeb(email, password);
+
+      res.json(payload);
+    })
+  );
+
+  app.get(
+    "/check/rigo/status",
+    withHandler(async (_: express.Request, res: express.Response) => {
+      const payload = await SessionManager.getPayload();
+      console.log("Looking Rigo creds");
+
+      if (payload && payload.rigobot && payload.rigobot.key) {
+        res.json({ rigoToken: payload.rigobot.key });
+      } else {
+        res
+          .status(400)
+          .json({ details: `Rigobot token not found, please log in first!` });
+      }
+    })
+  );
 
   // symbolic link to maintain path compatiblity
   const fetchStaticAsset = withHandler((req, res) => {

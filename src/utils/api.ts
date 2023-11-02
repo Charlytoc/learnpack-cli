@@ -1,7 +1,8 @@
 import Console from "../utils/console";
 import * as storage from "node-persist";
 import cli from "cli-ux";
-const HOST = "https://learnpack.herokuapp.com";
+const HOST = "https://breathecode.herokuapp.com";
+const RIGOBOT_HOST = "https://rigobot.herokuapp.com";
 
 // eslint-disable-next-line
 const _fetch = require("node-fetch");
@@ -19,6 +20,7 @@ interface IOptions {
 
 const fetch = async (url: string, options: IOptions = {}) => {
   const headers: IHeaders = { "Content-Type": "application/json" };
+  Console.log(`Fetching ${url}`);
   let session = null;
   try {
     session = await storage.getItem("bc-payload");
@@ -64,18 +66,53 @@ throw APIError("Uknown error");
 
 const login = async (identification: string, password: string) => {
   try {
-    cli.action.start("Looking for credentials...");
+    cli.action.start(`Looking for credentials with ${identification}`);
     await cli.wait(1000);
-    const data = await fetch(`${HOST}/v1/auth/token/`, {
-      body: JSON.stringify({ identification, password }),
+    const url = `${HOST}/v1/auth/login/`;
+    // Console.log(url);
+    const data = await fetch(url, {
+      body: JSON.stringify({
+        email: identification,
+        password: password,
+      }),
       method: "post",
     });
     cli.action.stop("ready");
-    return data;
+    const payload = await loginRigo(data.token);
+
+    return { ...data, rigobot: payload };
   } catch (error) {
+    cli.action.stop("error");
     Console.error((error as TypeError).message);
     Console.debug(error);
   }
+};
+
+const loginRigo = async (token: string) => {
+  const rigoUrl = `${RIGOBOT_HOST}/v1/auth/me/token?breathecode_token=${token}`;
+  const rigoResp = await _fetch(rigoUrl);
+  const rigobotJson = await rigoResp.json();
+  return rigobotJson;
+};
+
+const getRigoFeedback = async (readme: string, currentCode: string) => {
+  const payload = {
+    current_code: Buffer.from(currentCode).toString("base64"), // Encode currentCode as base64
+    tutorial: Buffer.from(readme).toString("base64"), // Encode readme as base64
+  };
+
+  const session = await storage.getItem("bc-payload");
+  const response = await _fetch(`${RIGOBOT_HOST}/v1/conversation/feedback/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${session.rigobot.key}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const responseData = await response.json();
+  return responseData.feedback;
 };
 
 const publish = async (config: any) => {
@@ -191,4 +228,12 @@ const APIError = (error: TypeError | string, code?: number) => {
   return _err;
 };
 
-export default { login, publish, update, getPackage, getLangs, getAllPackages };
+export default {
+  login,
+  publish,
+  update,
+  getPackage,
+  getLangs,
+  getAllPackages,
+  getRigoFeedback,
+};

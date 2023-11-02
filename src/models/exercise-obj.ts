@@ -22,5 +22,6 @@ export interface IExercise {
 
 export interface IExerciseData {
   exerciseSlug: string;
+  entryPoint?: string;
   files: string[];
 }

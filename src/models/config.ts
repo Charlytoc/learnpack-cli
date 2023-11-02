@@ -4,7 +4,12 @@ export type TGrading = "isolated" | "incremental" | "no-grading";
 
 export type TMode = "preview" | "standalone";
 
-export type TConfigAction = "test" | "build" | "tutorial" | "reset";
+export type TConfigAction =
+  | "test"
+  | "build"
+  | "tutorial"
+  | "reset"
+  | "generate";
 
 export type TConfigObjAttributes = "config" | "exercises" | "grading";
 

@@ -7,8 +7,10 @@
 /yarn.lock
 node_modules
 /temp
-
+/temp-html
 .env
+
+/html-tutorial-exercises-course
 
 bin/.gitignore
 bin/.gitpod.dockerfile
