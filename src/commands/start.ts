@@ -4,9 +4,14 @@ import SessionCommand from "../utils/SessionCommand";
 import Console from "../utils/console";
 import socket from "../managers/socket";
 import queue from "../utils/fileQueue";
-import { decompress, downloadEditor } from "../managers/file";
+import {
+  decompress,
+  downloadEditor,
+  checkIfDirectoryExists,
+} from "../managers/file";
 import { prioritizeHTMLFile } from "../utils/misc";
 
+import API from "../utils/api";
 import createServer from "../managers/server";
 
 import { IGitpodData } from "../models/gitpod-data";
@@ -80,17 +85,23 @@ export default class StartCommand extends SessionCommand {
         } exercises found`
       );
 
-      // download app and decompress
-      await downloadEditor(
-        config?.editor.version,
-        `${config?.dirPath}/app.tar.gz`
+      const appAlreadyExists = checkIfDirectoryExists(
+        `${config?.dirPath}/_app`
       );
 
-      Console.info("Decompressing LearnPack UI, this may take a minute...");
-      await decompress(
-        `${config?.dirPath}/app.tar.gz`,
-        `${config?.dirPath}/_app/`
-      );
+      if (!appAlreadyExists) {
+        // download app and decompress
+        await downloadEditor(
+          config?.editor.version,
+          `${config?.dirPath}/app.tar.gz`
+        );
+
+        Console.info("Decompressing LearnPack UI, this may take a minute...");
+        await decompress(
+          `${config?.dirPath}/app.tar.gz`,
+          `${config?.dirPath}/_app/`
+        );
+      }
 
       // listen to socket commands
       if (config && this.configManager) {
@@ -109,7 +120,11 @@ export default class StartCommand extends SessionCommand {
 
         socket.on("open", (data: IGitpodData) => {
           Console.debug("Opening these files: ", data);
+          console.log("Opening files", data);
+
           const files = prioritizeHTMLFile(data.files);
+          // console.log("files",files);
+
           dispatcher.enqueue(dispatcher.events.OPEN_FILES, files);
           socket.ready("Ready to compile...");
         });
@@ -117,6 +132,8 @@ export default class StartCommand extends SessionCommand {
         socket.on("open_window", (data: IGitpodData) => {
           Console.debug("Opening window: ", data);
           dispatcher.enqueue(dispatcher.events.OPEN_WINDOW, data);
+          console.log(data);
+
           socket.ready("Ready to compile...");
         });
 
@@ -172,8 +189,48 @@ export default class StartCommand extends SessionCommand {
           });
         });
 
+        socket.on("generate", async (data: IExerciseData) => {
+          const exercise = this.configManager?.getExercise(data.exerciseSlug);
+          let fileAsString = "";
+          let readme = "";
+
+          if (
+            exercise &&
+            exercise.getFile &&
+            data.entryPoint &&
+            exercise.getReadme
+          ) {
+            const file = exercise.getFile(data.entryPoint);
+            fileAsString = file.toString("utf8");
+            readme = exercise.getReadme(null).body;
+          }
+
+          if (!exercise?.language) {
+            socket.error(
+              "compiler-error",
+              "Impossible to detect engine language for testing for " +
+                data.exerciseSlug +
+                "..."
+            );
+            return;
+          }
+
+          if (config?.disabledActions!.includes("generate")) {
+            socket.error(
+              "compiler-error",
+              "First login with your credentials!"
+            );
+            return true;
+          }
+
+          const feedback = await API.getRigoFeedback(readme, fileAsString);
+          socket.success("compiler", feedback);
+        });
+
         socket.on("test", async (data: IExerciseData) => {
           const exercise = this.configManager?.getExercise(data.exerciseSlug);
+
+          console.log("data", data);
 
           if (!exercise?.language) {
             socket.error(
@@ -198,12 +255,15 @@ export default class StartCommand extends SessionCommand {
             "Testing your exercise using the " + exercise.language + " engine."
           );
 
+          console.log("About to call runHook");
+
           await this.config.runHook("action", {
             action: "test",
             socket,
             configuration: config,
             exercise,
           });
+
           this.configManager?.save();
 
           return true;

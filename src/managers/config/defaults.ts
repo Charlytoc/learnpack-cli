@@ -3,7 +3,7 @@ export default {
     port: 3000,
     editor: {
       mode: null, // [standalone, preview]
-      agent: null, // [vscode, gitpod, localhost]
+      agent: null, // [vscode, gitpod, localhost, codespaces] TODO: We need to check if we are in codespaces
       version: null,
     },
     dirPath: "./.learn",

@@ -36,6 +36,7 @@ server = require("http").Server(app);
   // })
 
   // add all needed endpoints
+
   await addRoutes(app, configObj, configManager);
 
   server.listen(isTestingEnvironment ? 5000 : config?.port, function () {

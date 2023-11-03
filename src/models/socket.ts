@@ -1,10 +1,15 @@
-import {IConfig} from './config'
-import {Server} from 'socket.io'
-import {DefaultEventsMap} from 'socket.io/dist/typed-events'
-import {TAction, ICallback} from './action'
-import {TStatus} from './status'
+import { IConfig } from "./config";
+import { Server } from "socket.io";
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
+import { TAction, ICallback } from "./action";
+import { TStatus } from "./status";
 
-export type TPossibleActions = 'build' | 'test' | 'reset' | 'tutorial';
+export type TPossibleActions =
+  | "build"
+  | "test"
+  | "reset"
+  | "tutorial"
+  | "generate";
 
 export interface ISocket {
   socket: Server<
@@ -23,6 +28,7 @@ export interface ISocket {
   start: (config: IConfig, server: any, isTestingEnvironment: boolean) => void;
   on: (action: any, callBack: any) => void;
   clean: (_: string, logs: Array<any>) => void;
+  complete: () => void;
   ask: (questions: Array<string>) => void;
   reload: (files: Array<string> | null, exercises: Array<string>) => void;
   openWindow: (id: string) => void;
