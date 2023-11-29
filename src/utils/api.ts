@@ -95,6 +95,11 @@ const loginRigo = async (token: string) => {
   return rigobotJson;
 };
 
+const getOpenAIToken = async () => {
+  const token = await storage.getItem("openai-token");
+  return token;
+};
+
 const getRigoFeedback = async (readme: string, currentCode: string) => {
   const payload = {
     current_code: Buffer.from(currentCode).toString("base64"), // Encode currentCode as base64
@@ -102,6 +107,7 @@ const getRigoFeedback = async (readme: string, currentCode: string) => {
   };
 
   const session = await storage.getItem("bc-payload");
+
   const response = await _fetch(`${RIGOBOT_HOST}/v1/conversation/feedback/`, {
     method: "POST",
     headers: {
@@ -236,4 +242,5 @@ export default {
   getLangs,
   getAllPackages,
   getRigoFeedback,
+  getOpenAIToken,
 };

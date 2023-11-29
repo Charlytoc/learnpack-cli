@@ -68,15 +68,33 @@ export default async function (
       res.json(payload);
     })
   );
+  app.post(
+    "/set-openai-token",
+    jsonBodyParser,
+    withHandler(async (req: express.Request, res: express.Response) => {
+      const token = req.body.token;
+      console.log("Setting openai token");
+
+      const tokenSaved = await SessionManager.setOpenAIToken(token);
+      if (tokenSaved) {
+        res.json({ status: "ok" });
+      } else {
+        res.status(400);
+      }
+    })
+  );
 
   app.get(
     "/check/rigo/status",
     withHandler(async (_: express.Request, res: express.Response) => {
       const payload = await SessionManager.getPayload();
-      console.log("Looking Rigo creds");
+      const openaiToken = await SessionManager.getOpenAIToken();
+      // console.log("Looking Rigo creds");
 
       if (payload && payload.rigobot && payload.rigobot.key) {
         res.json({ rigoToken: payload.rigobot.key });
+      } else if (openaiToken) {
+        res.json({ openaiToken });
       } else {
         res
           .status(400)

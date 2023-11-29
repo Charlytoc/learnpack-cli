@@ -18,18 +18,6 @@ import createServer from "../managers/server";
 import { IGitpodData } from "../models/gitpod-data";
 import { IExercise, IExerciseData } from "../models/exercise-obj";
 
-// TODO: SAVE OPENAI KEY IN SESSION WHEN LOGIN OR ADDING OPENAI KEY and retrieve it from session
-const API_KEY =
-  process.env.OPENAI_API_KEY ||
-  "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";
-
-if (!API_KEY) 
-throw new Error("No API Key provided");
-
-const openai = new OpenAI({
-  apiKey: API_KEY,
-});
-
 export default class StartCommand extends SessionCommand {
   static description = "Runs a small server with all the exercise instructions";
 
@@ -208,6 +196,15 @@ export default class StartCommand extends SessionCommand {
           let fileAsString = "";
           const conversation = data.lastMessages;
           let readme = "";
+
+          const API_KEY = await API.getOpenAIToken();
+
+          if (!API_KEY) 
+throw new Error("No API Key provided");
+
+          const openai = new OpenAI({
+            apiKey: API_KEY,
+          });
 
           if (
             exercise &&
