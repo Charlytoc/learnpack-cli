@@ -1,5 +1,6 @@
 // import path from "path";
 import { flags } from "@oclif/command";
+import OpenAI from "openai";
 import SessionCommand from "../utils/SessionCommand";
 import Console from "../utils/console";
 import socket from "../managers/socket";
@@ -191,8 +192,19 @@ export default class StartCommand extends SessionCommand {
 
         socket.on("generate", async (data: IExerciseData) => {
           const exercise = this.configManager?.getExercise(data.exerciseSlug);
+          const userMessage = data.userMessage;
           let fileAsString = "";
+          const conversation = data.lastMessages;
           let readme = "";
+
+          const API_KEY = await API.getOpenAIToken();
+
+          if (!API_KEY) 
+throw new Error("No API Key provided");
+
+          const openai = new OpenAI({
+            apiKey: API_KEY,
+          });
 
           if (
             exercise &&
@@ -223,8 +235,51 @@ export default class StartCommand extends SessionCommand {
             return true;
           }
 
-          const feedback = await API.getRigoFeedback(readme, fileAsString);
-          socket.success("compiler", feedback);
+          const systemMessage = `You're a powerful coding AI tutor. You can help students learn to code by guiding them in the correct path and explaining it what they need to succesfully continue their coding journey. You will always receive the current student code and the exercise instructions.
+          
+          These are the instructions for this exercise: 
+          ---instructions
+          ${readme}
+          ---
+
+          And this is the student current code:
+
+          ---current-code
+          ${fileAsString}
+          ---
+
+          This is the last messages on the conversation: 
+
+          ---conversation
+          ${conversation}
+          ---
+
+
+          Focus on guiding the student in the correct path explaining everything needed in a understandable manner for a beginner and NEVER give the solution directly, the student must learn by doing the exercise by itself, you must just guide him.
+
+          Help the student with its requirements.
+
+          `;
+
+          const completionPromise = await openai.chat.completions.create({
+            messages: [
+              { role: "system", content: systemMessage },
+              { role: "user", content: userMessage || "Just give me a tip" },
+            ],
+            model: "gpt-4",
+            stream: true,
+          });
+
+          for await (const chunk of completionPromise) {
+            const c = chunk.choices[0]?.delta?.content;
+            if (typeof c !== "string") 
+continue;
+            socket.emit("generation", "pending", c);
+          }
+
+          socket.emit("generation", "completed", "");
+          // const feedback = await API.getRigoFeedback(readme, fileAsString);
+          // socket.success("compiler", feedback);
         });
 
         socket.on("test", async (data: IExerciseData) => {

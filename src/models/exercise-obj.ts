@@ -21,6 +21,8 @@ export interface IExercise {
 }
 
 export interface IExerciseData {
+  lastMessages?: any;
+  userMessage?: string;
   exerciseSlug: string;
   entryPoint?: string;
   files: string[];
