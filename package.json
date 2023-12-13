@@ -10,7 +10,6 @@
     "url": "https://github.com/learnpack/learnpack-cli/issues"
   },
   "dependencies": {
-    "@learnpack/python": "^1.0.0",
     "@oclif/command": "^1.6.1",
     "@oclif/config": "^1.15.1",
     "@oclif/plugin-help": "^3.1.0",
