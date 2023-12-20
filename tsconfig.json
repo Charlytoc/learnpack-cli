@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "composite": true,
     "declaration": true,
     "skipLibCheck": true,
     "importHelpers": true,
@@ -12,5 +13,5 @@
   },
   "include": [
     "src/**/*"
-  ]
+  ],
 }
