@@ -1,5 +1,5 @@
-import { IConfig } from "./config";
-import { IExercise } from "./exercise-obj";
+import { IConfig } from "./config"
+import { IExercise } from "./exercise-obj"
 
 export interface IPluginConfig {
   language: string;
