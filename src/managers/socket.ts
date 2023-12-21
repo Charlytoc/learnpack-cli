@@ -1,36 +1,36 @@
-import { Socket, Server } from "socket.io";
-import Console from "../utils/console";
-import queue from "../utils/fileQueue";
+import { Socket, Server } from "socket.io"
+import Console from "../utils/console"
+import queue from "../utils/fileQueue"
 
-import { ISocket, TPossibleActions } from "../models/socket";
-import { IConfig } from "../models/config";
-import { ICallback, TAction } from "../models/action";
-import { IExercise, IExerciseData } from "../models/exercise-obj";
-import { TStatus } from "../models/status";
-import { TSuccessType } from "../models/success-types";
-import * as http from "http";
+import { ISocket, TPossibleActions } from "../models/socket"
+import { IConfig } from "../models/config"
+import { ICallback, TAction } from "../models/action"
+import { IExercise, IExerciseData } from "../models/exercise-obj"
+import { TStatus } from "../models/status"
+import { TSuccessType } from "../models/success-types"
+import * as http from "http"
 
 const SocketManager: ISocket = {
   socket: null,
   config: null,
   allowedActions: [],
-  possibleActions: ["build", "reset", "test", "tutorial", "generate"],
+  possibleActions: ["build", "reset", "test", "tutorial"],
   isTestingEnvironment: false,
   actionCallBacks: {
     clean: (_, s: { logs: Array<string> }) => {
-      s.logs = [];
+      s.logs = []
     },
   },
   addAllowed: function (actions: Array<TPossibleActions> | TPossibleActions) {
     if (!Array.isArray(actions)) 
-actions = [actions];
+actions = [actions]
 
     // avoid adding the "test" action if grading is disabled
     if (
       actions.includes("test") &&
       this.config?.disabledActions?.includes("test")
     ) {
-      actions = actions.filter((a: TPossibleActions) => a !== "test");
+      actions = actions.filter((a: TPossibleActions) => a !== "test")
     }
 
     this.allowedActions = [
@@ -38,33 +38,33 @@ actions = [actions];
         (a: TPossibleActions) => !actions.includes(a)
       ),
       ...actions,
-    ];
+    ]
   },
   removeAllowed: function (
     actions: Array<TPossibleActions> | TPossibleActions
   ) {
     if (!Array.isArray(actions)) {
-      actions = [actions];
+      actions = [actions]
     }
 
     this.allowedActions = (this.allowedActions || []).filter(
       (a: TPossibleActions) => !actions.includes(a)
-    );
+    )
   },
   start: function (
     config: IConfig,
     server: http.Server,
     isTestingEnvironment = false
   ) {
-    this.config = config;
-    this.isTestingEnvironment = isTestingEnvironment;
+    this.config = config
+    this.isTestingEnvironment = isTestingEnvironment
     this.socket = new Server(server, {
       allowEIO3: true,
       cors: {
         origin: "http://localhost:5173",
         methods: ["GET", "POST"],
       },
-    });
+    })
 
     this.allowedActions =
       this.config?.disabledActions?.includes("test") ||
@@ -72,10 +72,10 @@ actions = [actions];
         this.possibleActions.filter(
             a => !this.config?.disabledActions?.includes(a) && a !== "test"
           ) :
-        this.possibleActions.filter(a => !this.allowedActions?.includes(a));
+        this.possibleActions.filter(a => !this.allowedActions?.includes(a))
 
     if (this.config?.grading === "incremental") {
-      this.removeAllowed("reset");
+      this.removeAllowed("reset")
     }
 
     if (this.socket) {
@@ -83,64 +83,64 @@ actions = [actions];
         Console.debug(
           "Connection with client successfully established",
           this.allowedActions
-        );
+        )
         if (!this.isTestingEnvironment) {
-          this.log("ready", ["Ready to compile or test..."]);
+          this.log("ready", ["Ready to compile or test..."])
         }
 
         socket.on(
           "compiler",
           ({ action, data }: { action: string; data: IExerciseData }) => {
-            this.emit("clean", "pending", ["Working..."]);
+            this.emit("clean", "pending", ["Working..."])
             if (typeof data.exerciseSlug === "undefined") {
-              this.log("internal-error", ["No exercise slug specified"]);
-              Console.error("No exercise slug especified");
-              return;
+              this.log("internal-error", ["No exercise slug specified"])
+              Console.error("No exercise slug especified")
+              return
             }
 
             if (
               this.actionCallBacks &&
               typeof this.actionCallBacks[action] === "function"
             ) {
-              this.actionCallBacks[action](data);
+              this.actionCallBacks[action](data)
             } else {
-              this.log("internal-error", ["Uknown action " + action]);
+              this.log("internal-error", ["Uknown action " + action])
             }
           }
-        );
-      });
+        )
+      })
     }
   },
   on: function (action: TAction, callBack: ICallback) {
     if (this.actionCallBacks) {
-      this.actionCallBacks[action] = callBack;
+      this.actionCallBacks[action] = callBack
     }
   },
   clean: function (_ = "pending", logs = []) {
-    this.emit("clean", "pending", logs);
+    this.emit("clean", "pending", logs)
   },
   ask: function (questions = []) {
     return new Promise((resolve, _) => {
-      this.emit("ask", "pending", ["Waiting for input..."], questions);
-      console.log("Setting up listeners");
+      this.emit("ask", "pending", ["Waiting for input..."], questions)
+      console.log("Setting up listeners")
       this.on("input", ({ inputs }: any) => {
         // Workaround to fix issue because null inputs
 
-        console.log("inputs", inputs);
+        console.log("inputs", inputs)
 
-        let isNull = false;
+        let isNull = false
         // eslint-disable-next-line
         inputs.forEach((input: any) => {
           if (input === null) {
-            isNull = true;
+            isNull = true
           }
-        });
+        })
 
         if (!isNull) {
-          resolve(inputs);
+          resolve(inputs)
         }
-      });
-    });
+      })
+    })
   },
   reload: function (
     files: Array<string> | null = null,
@@ -150,10 +150,10 @@ actions = [actions];
       "reload",
       files?.join("") || "" /* TODO: Check it out this */,
       exercises!
-    );
+    )
   },
   openWindow: function (url = "") {
-    queue.dispatcher().enqueue(queue.events.OPEN_WINDOW, url);
+    queue.dispatcher().enqueue(queue.events.OPEN_WINDOW, url)
     this.emit(
       queue.events.OPEN_WINDOW as TAction,
       "ready",
@@ -161,7 +161,7 @@ actions = [actions];
       [],
       [],
       url
-    );
+    )
   },
   log: function (
     status: TStatus,
@@ -169,8 +169,8 @@ actions = [actions];
     report: Array<string> = [],
     data: any = null
   ) {
-    this.emit("log", status, messages, [], report, data);
-    Console.log(messages);
+    this.emit("log", status, messages, [], report, data)
+    Console.log(messages)
   },
   emit: function (
     action: TAction,
@@ -187,13 +187,13 @@ actions = [actions];
       )
     ) {
       if (["compiler-success", "compiler-warning"].includes(status))
-        this.addAllowed("preview");
+        this.addAllowed("preview")
       if (["compiler-error"].includes(status) || action === "ready")
-        this.removeAllowed("preview");
+        this.removeAllowed("preview")
     }
 
     if (this.config?.grading === "incremental") {
-      this.removeAllowed("reset");
+      this.removeAllowed("reset")
     }
 
     // eslint-disable-next-line
@@ -207,46 +207,46 @@ actions = [actions];
       inputs,
       report,
       data,
-    });
+    })
   },
 
   ready: function (message: string) {
-    this.log("ready", [message]);
+    this.log("ready", [message])
   },
   success: function (type: TSuccessType, stdout: string) {
-    const types = ["compiler", "testing"];
+    const types = ["compiler", "testing"]
     if (!types.includes(type))
-      this.fatal(`Invalid socket success type "${type}" on socket`);
+      this.fatal(`Invalid socket success type "${type}" on socket`)
     else if (stdout === "")
       this.log((type + "-success") as TSuccessType, [
         "No stdout to display on the console",
-      ]);
+      ])
     else 
-this.log((type + "-success") as TSuccessType, [stdout]);
+this.log((type + "-success") as TSuccessType, [stdout])
   },
   error: function (type: TStatus, stdout: string) {
-    console.error("Socket error: " + type, stdout);
-    this.log(type, [stdout]);
+    console.error("Socket error: " + type, stdout)
+    this.log(type, [stdout])
 
     if (this.isTestingEnvironment) {
       this.onTestingFinished({
         result: "failed",
-      });
+      })
     }
   },
   complete: function () {
-    console.log("complete");
+    console.log("complete")
   },
 
   fatal: function (msg: string) {
-    this.log("internal-error", [msg]);
-    throw msg;
+    this.log("internal-error", [msg])
+    throw msg
   },
   onTestingFinished: function (result: any) {
     if (this.config?.testingFinishedCallback) {
-      this.config.testingFinishedCallback(result);
+      this.config.testingFinishedCallback(result)
     }
   },
-};
+}
 
-export default SocketManager;
+export default SocketManager

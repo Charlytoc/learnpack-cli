@@ -1,24 +1,24 @@
 // import path from "path";
-import { flags } from "@oclif/command";
+import { flags } from "@oclif/command"
 
-import SessionCommand from "../utils/SessionCommand";
-import Console from "../utils/console";
-import socket from "../managers/socket";
-import queue from "../utils/fileQueue";
+import SessionCommand from "../utils/SessionCommand"
+import Console from "../utils/console"
+import socket from "../managers/socket"
+import queue from "../utils/fileQueue"
 import {
   decompress,
   downloadEditor,
   checkIfDirectoryExists,
-} from "../managers/file";
-import { prioritizeHTMLFile } from "../utils/misc";
+} from "../managers/file"
+import { prioritizeHTMLFile } from "../utils/misc"
 
-import createServer from "../managers/server";
+import createServer from "../managers/server"
 
-import { IGitpodData } from "../models/gitpod-data";
-import { IExercise, IExerciseData } from "../models/exercise-obj";
+import { IGitpodData } from "../models/gitpod-data"
+import { IExercise, IExerciseData } from "../models/exercise-obj"
 
 export default class StartCommand extends SessionCommand {
-  static description = "Runs a small server with all the exercise instructions";
+  static description = "Runs a small server with all the exercise instructions"
 
   static flags = {
     ...SessionCommand.flags,
@@ -55,25 +55,25 @@ export default class StartCommand extends SessionCommand {
       description: "debugger mode for more verbage",
       default: false,
     }),
-  };
+  }
 
   // 🛑 IMPORTANT
   // Every command that will use the configManager needs this init method
   async init() {
-    const { flags } = this.parse(StartCommand);
-    await this.initSession(flags);
+    const { flags } = this.parse(StartCommand)
+    await this.initSession(flags)
   }
 
   async run() {
     // get configuration object
-    const configObject = this.configManager?.get();
-    const config = configObject?.config;
+    const configObject = this.configManager?.get()
+    const config = configObject?.config
 
     if (configObject) {
-      const { config } = configObject;
+      const { config } = configObject
 
       // build exerises
-      this.configManager?.buildIndex();
+      this.configManager?.buildIndex()
 
       Console.debug(
         `Grading: ${config?.grading} ${
@@ -83,24 +83,24 @@ export default class StartCommand extends SessionCommand {
             configObject?.exercises.length :
             0
         } exercises found`
-      );
+      )
 
       const appAlreadyExists = checkIfDirectoryExists(
         `${config?.dirPath}/_app`
-      );
+      )
 
       if (!appAlreadyExists) {
         // download app and decompress
         await downloadEditor(
           config?.editor.version,
           `${config?.dirPath}/app.tar.gz`
-        );
+        )
 
-        Console.info("Decompressing LearnPack UI, this may take a minute...");
+        Console.info("Decompressing LearnPack UI, this may take a minute...")
         await decompress(
           `${config?.dirPath}/app.tar.gz`,
           `${config?.dirPath}/_app/`
-        );
+        )
       }
 
       // listen to socket commands
@@ -109,51 +109,51 @@ export default class StartCommand extends SessionCommand {
           configObject,
           this.configManager,
           process.env.NODE_ENV === "test"
-        );
+        )
 
         const dispatcher = queue.dispatcher({
           create: true,
           path: `${config.dirPath}/vscode_queue.json`,
-        });
+        })
 
-        socket.start(config, server, false);
+        socket.start(config, server, false)
 
         socket.on("open", (data: IGitpodData) => {
-          Console.debug("Opening these files: ", data);
-          console.log("Opening files", data);
+          Console.debug("Opening these files: ", data)
+          console.log("Opening files", data)
 
-          const files = prioritizeHTMLFile(data.files);
+          const files = prioritizeHTMLFile(data.files)
           // console.log("files",files);
 
-          dispatcher.enqueue(dispatcher.events.OPEN_FILES, files);
-          socket.ready("Ready to compile...");
-        });
+          dispatcher.enqueue(dispatcher.events.OPEN_FILES, files)
+          socket.ready("Ready to compile...")
+        })
 
         socket.on("open_window", (data: IGitpodData) => {
-          Console.debug("Opening window: ", data);
-          dispatcher.enqueue(dispatcher.events.OPEN_WINDOW, data);
-          console.log(data);
+          Console.debug("Opening window: ", data)
+          dispatcher.enqueue(dispatcher.events.OPEN_WINDOW, data)
+          console.log(data)
 
-          socket.ready("Ready to compile...");
-        });
+          socket.ready("Ready to compile...")
+        })
 
         socket.on("reset", (exercise: IExerciseData) => {
           try {
-            this.configManager?.reset(exercise.exerciseSlug);
+            this.configManager?.reset(exercise.exerciseSlug)
             dispatcher.enqueue(
               dispatcher.events.RESET_EXERCISE,
               exercise.exerciseSlug
-            );
-            socket.ready("Ready to compile...");
+            )
+            socket.ready("Ready to compile...")
           } catch (error) {
             socket.error(
               "compiler-error",
               (error as TypeError).message ||
                 "There was an error reseting the exercise"
-            );
-            setTimeout(() => socket.ready("Ready to compile..."), 2000);
+            )
+            setTimeout(() => socket.ready("Ready to compile..."), 2000)
           }
-        });
+        })
         // socket.on("preview", (data) => {
         //   Console.debug("Preview triggered, removing the 'preview' action ")
         //   socket.removeAllowed("preview")
@@ -161,7 +161,7 @@ export default class StartCommand extends SessionCommand {
         // })
 
         socket.on("build", async (data: IExerciseData) => {
-          const exercise = this.configManager?.getExercise(data.exerciseSlug);
+          const exercise = this.configManager?.getExercise(data.exerciseSlug)
 
           if (!exercise?.language) {
             socket.error(
@@ -169,8 +169,8 @@ export default class StartCommand extends SessionCommand {
               "Impossible to detect language to build for " +
                 data.exerciseSlug +
                 "..."
-            );
-            return;
+            )
+            return
           }
 
           socket.log(
@@ -180,23 +180,23 @@ export default class StartCommand extends SessionCommand {
               " with " +
               exercise.language +
               "..."
-          );
+          )
           await this.config.runHook("action", {
             action: "compile",
             socket,
             configuration: config,
             exercise,
-          });
-        });
+          })
+        })
 
         socket.on("generate", async (data: IExerciseData) => {
-          console.log("data", data);
-        });
+          console.log("data", data)
+        })
 
         socket.on("test", async (data: IExerciseData) => {
-          const exercise = this.configManager?.getExercise(data.exerciseSlug);
+          const exercise = this.configManager?.getExercise(data.exerciseSlug)
 
-          console.log("data", data);
+          console.log("data", data)
 
           if (!exercise?.language) {
             socket.error(
@@ -204,60 +204,60 @@ export default class StartCommand extends SessionCommand {
               "Impossible to detect engine language for testing for " +
                 data.exerciseSlug +
                 "..."
-            );
-            return;
+            )
+            return
           }
 
           if (
             config?.disabledActions!.includes("test") ||
             config?.disableGrading
           ) {
-            socket.ready("Grading is disabled on configuration");
-            return true;
+            socket.ready("Grading is disabled on configuration")
+            return true
           }
 
           socket.log(
             "testing",
             "Testing your exercise using the " + exercise.language + " engine."
-          );
+          )
 
-          console.log("About to call runHook");
+          console.log("About to call runHook")
 
           await this.config.runHook("action", {
             action: "test",
             socket,
             configuration: config,
             exercise,
-          });
+          })
 
-          this.configManager?.save();
+          this.configManager?.save()
 
-          return true;
-        });
+          return true
+        })
 
         const terminate = () => {
-          Console.debug("Terminating Learnpack...");
+          Console.debug("Terminating Learnpack...")
           server.terminate(() => {
-            this.configManager?.noCurrentExercise();
-            dispatcher.enqueue(dispatcher.events.END);
-            process.exit();
-          });
-        };
+            this.configManager?.noCurrentExercise()
+            dispatcher.enqueue(dispatcher.events.END)
+            process.exit()
+          })
+        }
 
-        server.on("close", terminate);
-        process.on("SIGINT", terminate);
-        process.on("SIGTERM", terminate);
-        process.on("SIGHUP", terminate);
+        server.on("close", terminate)
+        process.on("SIGINT", terminate)
+        process.on("SIGTERM", terminate)
+        process.on("SIGHUP", terminate)
 
         // finish the server startup
-        setTimeout(() => dispatcher.enqueue(dispatcher.events.RUNNING), 1000);
+        setTimeout(() => dispatcher.enqueue(dispatcher.events.RUNNING), 1000)
 
         // start watching for file changes
 
         if (StartCommand.flags.watch)
           this.configManager.watchIndex(_exercises =>
             socket.reload(null, _exercises)
-          );
+          )
       }
     }
   }

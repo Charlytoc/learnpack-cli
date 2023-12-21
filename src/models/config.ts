@@ -1,4 +1,4 @@
-import { IExercise } from "./exercise-obj";
+import { IExercise } from "./exercise-obj"
 
 export type TGrading = "isolated" | "incremental" | "no-grading";
 

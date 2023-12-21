@@ -1,31 +1,31 @@
-import { flags } from "@oclif/command";
-import BaseCommand from "../utils/BaseCommand";
+import { flags } from "@oclif/command"
+import BaseCommand from "../utils/BaseCommand"
 
 // eslint-disable-next-line
 import * as fs from "fs-extra";
-import * as prompts from "prompts";
-import cli from "cli-ux";
-import * as eta from "eta";
+import * as prompts from "prompts"
+import cli from "cli-ux"
+import * as eta from "eta"
 
-import Console from "../utils/console";
-import { ValidationError } from "../utils/errors";
+import Console from "../utils/console"
+import { ValidationError } from "../utils/errors"
 
-import * as path from "path";
+import * as path from "path"
 
 class InitComand extends BaseCommand {
   static description =
-    "Create a new learning package: Book, Tutorial or Exercise";
+    "Create a new learning package: Book, Tutorial or Exercise"
 
   static flags = {
     ...BaseCommand.flags,
     grading: flags.help({ char: "h" }),
-  };
+  }
 
   async run() {
-    const { flags } = this.parse(InitComand);
+    const { flags } = this.parse(InitComand)
 
     // if the folder/file .learn or .breathecode aleady exists
-    await alreadyInitialized();
+    await alreadyInitialized()
 
     const choices = await prompts([
       {
@@ -76,13 +76,13 @@ class InitComand extends BaseCommand {
         initial: "1",
         message: "How many hours avg it takes to complete (number)?",
         validate: (value: string) => {
-          const n = Math.floor(Number(value));
+          const n = Math.floor(Number(value))
           return (
             n !== Number.POSITIVE_INFINITY && String(n) === value && n >= 0
-          );
+          )
         },
       },
-    ]);
+    ])
 
     const packageInfo = {
       grading: choices.grading,
@@ -94,24 +94,24 @@ class InitComand extends BaseCommand {
         .toLowerCase()
         .replace(/ /g, "-")
         .replace(/[^\w-]+/g, ""),
-    };
+    }
 
-    cli.action.start("Initializing package");
+    cli.action.start("Initializing package")
 
-    const languages = ["en", "es"];
+    const languages = ["en", "es"]
 
     const templatesDir = path.resolve(
       __dirname,
       "../../src/utils/templates/" + choices.grading || "no-grading"
-    );
+    )
     if (!fs.existsSync(templatesDir))
-      throw ValidationError(`Template ${templatesDir} does not exists`);
-    await fs.copySync(templatesDir, "./");
+      throw ValidationError(`Template ${templatesDir} does not exists`)
+    await fs.copySync(templatesDir, "./")
 
     // Creating README files
     // eslint-disable-next-line
     languages.forEach((language) => {
-      const readmeFilename = `README${language !== "en" ? `.${language}` : ""}`;
+      const readmeFilename = `README${language !== "en" ? `.${language}` : ""}`
       fs.writeFileSync(
         `./${readmeFilename}.md`,
         eta.render(
@@ -121,23 +121,23 @@ class InitComand extends BaseCommand {
           ),
           packageInfo
         )
-      );
+      )
       if (fs.existsSync(`./${readmeFilename}.ejs`))
-        fs.removeSync(`./${readmeFilename}.ejs`);
-    });
+        fs.removeSync(`./${readmeFilename}.ejs`)
+    })
 
     if (!fs.existsSync("./.gitignore"))
       fs.copyFile(
         path.resolve(__dirname, "../../src/utils/templates/gitignore.txt"),
         "./.gitignore"
-      );
-    fs.writeFileSync("./learn.json", JSON.stringify(packageInfo, null, 2));
+      )
+    fs.writeFileSync("./learn.json", JSON.stringify(packageInfo, null, 2))
 
-    cli.action.stop();
-    Console.success(`😋 Package initialized successfully`);
+    cli.action.stop()
+    Console.success(`😋 Package initialized successfully`)
     Console.help(
       `Start the exercises by running the following command on your terminal: $ learnpack start`
-    );
+    )
   }
 }
 
@@ -146,25 +146,25 @@ const alreadyInitialized = () =>
     fs.readdir("./", function (err: any, files: any) {
       files = files.filter((f: any) =>
         [".learn", "learn.json", "bc.json", ".breathecode"].includes(f)
-      );
+      )
       if (err) {
-        reject(ValidationError(err.message));
-        throw ValidationError(err.message);
+        reject(ValidationError(err.message))
+        throw ValidationError(err.message)
       } else if (files.length > 0) {
         reject(
           ValidationError(
             "It seems the package is already initialized because we've found the following files: " +
               files.join(",")
           )
-        );
+        )
         throw ValidationError(
           "It seems the package is already initialized because we've found the following files: " +
             files.join(",")
-        );
+        )
       }
 
-      resolve(false);
-    });
-  });
+      resolve(false)
+    })
+  })
 
-export default InitComand;
+export default InitComand

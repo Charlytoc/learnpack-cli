@@ -23,3 +23,5 @@ bin/learn.json
 bin/preview.png
 
 .prettierrc
+
+tsconfig.tsbuildinfo
