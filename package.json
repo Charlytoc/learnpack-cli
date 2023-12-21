@@ -1,7 +1,7 @@
 {
-  "name": "@charlytoc/learnpack",
+  "name": "@learnpack/learnpack",
   "description": "Create, sell or download and take learning amazing learning packages",
-  "version": "2.1.27",
+  "version": "2.1.28",
   "author": "Alejandro Sanchez @alesanchezr",
   "bin": {
     "learnpack": "bin/run"
@@ -120,6 +120,7 @@
     ]
   },
   "scripts": {
+    "tsc": "tsc -b",
     "postpack": "rm -f oclif.manifest.json && eslint . --ext .ts --config .eslintrc",
     "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
     "pre": "node ./test/precommit/index.ts",
