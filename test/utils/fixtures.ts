@@ -1,6 +1,6 @@
-export const EDITOR_VERSION = "1.0.72";
+export const EDITOR_VERSION = "1.0.72"
 
-export const EXERCISE_SLUG = "00-Welcome";
+export const EXERCISE_SLUG = "00-Welcome"
 
 export const CONFIG_SAMPLE = {
   config: {
@@ -76,7 +76,7 @@ export const CONFIG_SAMPLE = {
       done: false,
     },
   ],
-};
+}
 
 export const LEARN_JSON = {
   slug: "the-dom-exercises",
@@ -97,4 +97,4 @@ export const LEARN_JSON = {
       version: "1.0.72",
     },
   },
-};
+}

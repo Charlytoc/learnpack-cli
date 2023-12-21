@@ -1,6 +1,6 @@
-import { IFile } from "./file";
-import { IConfig } from "./config";
-import { ISocket } from "./socket";
+import { IFile } from "./file"
+import { IConfig } from "./config"
+import { ISocket } from "./socket"
 
 export interface IExercise {
   position?: number;

@@ -35,4 +35,4 @@ export default {
   exercises: [],
   bugsLink: null,
   videoSolutions: false,
-};
+}

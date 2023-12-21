@@ -1,7 +1,7 @@
-import * as mockfs from "mock-fs";
-import * as path from "path";
-import * as fs from "fs";
-import { IExercise } from "../../src/models/exercise-obj";
+import * as mockfs from "mock-fs"
+import * as path from "path"
+import * as fs from "fs"
+import { IExercise } from "../../src/models/exercise-obj"
 
 export const mockFolders = (folders: any) => {
   const mockfsConf = {
@@ -15,31 +15,31 @@ export const mockFolders = (folders: any) => {
     node_modules: mockfs.load(path.resolve(__dirname, "../../node_modules")),
     ".nyc_output": mockfs.load(path.resolve(__dirname, "../../.nyc_output")),
     ...(folders ? folders : {}),
-  };
+  }
 
-  mockfs(mockfsConf, { createCwd: false });
-};
+  mockfs(mockfsConf, { createCwd: false })
+}
 
 export const restoreMockFolders = () => {
-  mockfs.restore();
-};
+  mockfs.restore()
+}
 
 export const isDirEmpty = (dirname: string) => {
-  return fs.readdirSync(dirname).length === 0;
-};
+  return fs.readdirSync(dirname).length === 0
+}
 
 export const buildExpectedConfig = (config: any) => {
-  delete config.config.session;
+  delete config.config.session
 
-  return config;
-};
+  return config
+}
 
 export const exerciseToPlainJson = (exercise: IExercise) => {
-  const exerciseCopy = { ...exercise };
-  delete exerciseCopy.getFile;
-  delete exerciseCopy.getReadme;
-  delete exerciseCopy.getTestReport;
-  delete exerciseCopy.saveFile;
+  const exerciseCopy = { ...exercise }
+  delete exerciseCopy.getFile
+  delete exerciseCopy.getReadme
+  delete exerciseCopy.getTestReport
+  delete exerciseCopy.saveFile
 
-  return exerciseCopy;
-};
+  return exerciseCopy
+}

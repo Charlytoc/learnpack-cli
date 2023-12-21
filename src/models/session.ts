@@ -1,4 +1,4 @@
-import { IConfig, IConfigObj } from "./config";
+import { IConfig, IConfigObj } from "./config"
 
 export interface IPayload {
   email: string;

@@ -24,6 +24,6 @@ const extensions = {
     "readme", // compressed files
   ],
   names: ["package.json", "package-lock.json"],
-};
+}
 
-export default extensions;
+export default extensions

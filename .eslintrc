@@ -9,7 +9,7 @@
     "unicorn/filename-case": "off",
     "camelcase": "off",
     "@typescript-eslint/no-non-null-asserted-optional-chain": "warn",
-    "semi": "off",
+    "semi": ["error", "never"],
     "padded-blocks": "off",
     "lines-between-class-members": "off",
     "unicorn/no-empty-file": "off",
