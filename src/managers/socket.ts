@@ -122,11 +122,9 @@ actions = [actions]
   ask: function (questions = []) {
     return new Promise((resolve, _) => {
       this.emit("ask", "pending", ["Waiting for input..."], questions)
-      console.log("Setting up listeners")
+
       this.on("input", ({ inputs }: any) => {
         // Workaround to fix issue because null inputs
-
-        console.log("inputs", inputs)
 
         let isNull = false
         // eslint-disable-next-line

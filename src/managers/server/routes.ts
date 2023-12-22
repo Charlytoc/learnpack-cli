@@ -73,7 +73,6 @@ export default async function (
     jsonBodyParser,
     withHandler(async (req: express.Request, res: express.Response) => {
       const token = req.body.token
-      console.log("Setting openai token")
 
       const tokenSaved = await SessionManager.setOpenAIToken(token)
       if (tokenSaved) {
