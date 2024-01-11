@@ -10,8 +10,6 @@ node_modules
 /temp-html
 .env
 
-/html-tutorial-exercises-course
-/python-lists-loops-programming-exercises
 
 bin/.gitignore
 bin/.gitpod.dockerfile
