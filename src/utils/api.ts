@@ -69,7 +69,7 @@ const login = async (identification: string, password: string) => {
     cli.action.start(`Looking for credentials with ${identification}`)
     await cli.wait(1000)
     const url = `${HOST}/v1/auth/login/`
-    // Console.log(url);
+
     const data = await fetch(url, {
       body: JSON.stringify({
         email: identification,
@@ -147,7 +147,6 @@ config[k] ? (payload[k] = config[k]) : null
     cli.action.stop("ready")
     return data
   } catch (error) {
-    console.log("payload", payload)
     Console.error((error as TypeError).message)
     Console.debug(error)
     throw error

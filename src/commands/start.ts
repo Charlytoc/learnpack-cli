@@ -120,10 +120,8 @@ export default class StartCommand extends SessionCommand {
 
         socket.on("open", (data: IGitpodData) => {
           Console.debug("Opening these files: ", data)
-          console.log("Opening files", data)
 
           const files = prioritizeHTMLFile(data.files)
-          // console.log("files",files);
 
           dispatcher.enqueue(dispatcher.events.OPEN_FILES, files)
           socket.ready("Ready to compile...")
@@ -132,8 +130,6 @@ export default class StartCommand extends SessionCommand {
         socket.on("open_window", (data: IGitpodData) => {
           Console.debug("Opening window: ", data)
           dispatcher.enqueue(dispatcher.events.OPEN_WINDOW, data)
-          console.log(data)
-
           socket.ready("Ready to compile...")
         })
 
@@ -190,13 +186,14 @@ export default class StartCommand extends SessionCommand {
         })
 
         socket.on("generate", async (data: IExerciseData) => {
-          console.log("data", data)
+          console.log(
+            "Receving generate event, this shouldn't be happening",
+            data
+          )
         })
 
         socket.on("test", async (data: IExerciseData) => {
           const exercise = this.configManager?.getExercise(data.exerciseSlug)
-
-          console.log("data", data)
 
           if (!exercise?.language) {
             socket.error(
@@ -220,8 +217,6 @@ export default class StartCommand extends SessionCommand {
             "testing",
             "Testing your exercise using the " + exercise.language + " engine."
           )
-
-          console.log("About to call runHook")
 
           await this.config.runHook("action", {
             action: "test",
