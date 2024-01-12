@@ -60,9 +60,7 @@ const Session: ISession = {
     let payload = null
     try {
       payload = await storage.getItem("bc-payload")
-    } catch (error) {
-      // TODO: Remove it
-      console.log(error)
+    } catch {
       Console.debug("Error retriving session payload")
     }
 

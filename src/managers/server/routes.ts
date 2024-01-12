@@ -73,7 +73,6 @@ export default async function (
     jsonBodyParser,
     withHandler(async (req: express.Request, res: express.Response) => {
       const token = req.body.token
-      console.log("Setting openai token")
 
       const tokenSaved = await SessionManager.setOpenAIToken(token)
       if (tokenSaved) {
@@ -89,7 +88,6 @@ export default async function (
     withHandler(async (_: express.Request, res: express.Response) => {
       const payload = await SessionManager.getPayload()
       const openaiToken = await SessionManager.getOpenAIToken()
-      // console.log("Looking Rigo creds");
 
       if (payload && payload.rigobot && payload.rigobot.key) {
         res.json({ rigoToken: payload.rigobot.key })

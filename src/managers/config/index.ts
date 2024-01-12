@@ -59,6 +59,7 @@ const getGitpodAddress = () => {
 
 const getCodespacesNamespace = () => {
   // https://orange-rotary-phone-wxpg49q5gcg4rp-3000.app.github.dev
+
   const codespace_name = shell
     .exec("echo $CODESPACE_NAME", { silent: true })
     .stdout.replace(/(\r\n|\n|\r)/gm, "")
@@ -66,7 +67,9 @@ const getCodespacesNamespace = () => {
   if (
     !codespace_name ||
     codespace_name === "" ||
-    codespace_name === undefined
+    codespace_name === undefined ||
+    // ! I added this line
+    codespace_name === "$CODESPACE_NAME"
   ) {
     return null
   }
@@ -81,6 +84,7 @@ export default async ({
   version,
 }: IConfigManagerAttributes): Promise<IConfigManager> => {
   const confPath = getConfigPath()
+
   Console.debug("This is the config path: ", confPath)
 
   let configObj: IConfigObj = {}
@@ -115,7 +119,6 @@ export default async ({
       config: jsonConfig,
       session: session,
     })
-    Console.debug("Content from the configuration .json ", configObj)
   } else {
     throw ValidationError(
       "No learn.json file has been found, make sure you are in the folder"
@@ -142,19 +145,37 @@ export default async ({
 
   // auto detect agent (if possible)
   const codespaces_workspace = getCodespacesNamespace()
+
+  Console.debug("This is the codespace namespace: ", codespaces_workspace)
+
+  Console.debug(
+    "This is the agent, and this should be null an the beginning: ",
+    configObj.config?.editor?.agent
+  )
+
   if (shell.which("gp") && configObj && configObj.config) {
+    Console.debug("Gitpod detected")
     configObj.config.editor.agent = "vscode"
     configObj.address = getGitpodAddress()
     configObj.config.publicUrl = `https://${
       configObj.config.port
     }-${configObj.address?.slice(8)}`
-  } else if (configObj.config && codespaces_workspace) {
+  } else if (configObj.config && Boolean(codespaces_workspace)) {
+    Console.debug("Codespaces detected: ", codespaces_workspace)
     configObj.config.editor.agent = "vscode"
+
     configObj.address = `https://${codespaces_workspace}.github.dev`
     configObj.config.publicUrl = `https://${codespaces_workspace}-${configObj.config.port}.app.github.dev`
-  } else if (configObj.config && !configObj.config.editor.agent) {
+    // TODO: Why is needed to have an agent?
+    // } else if (configObj.config && !configObj.config.editor.agent) {
+  } else if (configObj.config) {
+    Console.debug("Localhost detected")
     configObj.config.editor.agent = "localhost"
+    configObj.address = `http://localhost:${configObj.config.port}`
+    configObj.config.publicUrl = `http://localhost:${configObj.config.port}`
   }
+
+  Console.debug("This is the agent later", configObj?.config?.editor.agent)
 
   if (configObj.config && !configObj.config.publicUrl)
     configObj.config.publicUrl = `${configObj.address}:${configObj.config.port}`
@@ -384,7 +405,7 @@ onChange()
         })
     },
     save: () => {
-      Console.debug("Saving configuration with: ", configObj)
+      // Console.debug("Saving configuration with: ", configObj)
 
       // remove the duplicates form the actions array
       // configObj.config.actions = [...new Set(configObj.config.actions)];
