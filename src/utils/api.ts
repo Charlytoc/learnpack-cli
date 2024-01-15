@@ -78,9 +78,14 @@ const login = async (identification: string, password: string) => {
       method: "post",
     })
     cli.action.stop("ready")
-    const payload = await loginRigo(data.token)
+    let rigoPayload = null
+    try {
+      rigoPayload = await loginRigo(data.token)
+    } catch {
+      return { ...data, rigobot: null }
+    }
 
-    return { ...data, rigobot: payload }
+    return { ...data, rigobot: rigoPayload }
   } catch (error) {
     cli.action.stop("error")
     Console.error((error as TypeError).message)
@@ -89,36 +94,19 @@ const login = async (identification: string, password: string) => {
 }
 
 const loginRigo = async (token: string) => {
-  const rigoUrl = `${RIGOBOT_HOST}/v1/auth/me/token?breathecode_token=${token}`
-  const rigoResp = await _fetch(rigoUrl)
-  const rigobotJson = await rigoResp.json()
-  return rigobotJson
-}
-
-const getOpenAIToken = async () => {
-  const token = await storage.getItem("openai-token")
-  return token
-}
-
-const getRigoFeedback = async (readme: string, currentCode: string) => {
-  const payload = {
-    current_code: Buffer.from(currentCode).toString("base64"), // Encode currentCode as base64
-    tutorial: Buffer.from(readme).toString("base64"), // Encode readme as base64
+  try {
+    const rigoUrl = `${RIGOBOT_HOST}/v1/auth/me/token?breathecode_token=${token}`
+    const rigoResp = await _fetch(rigoUrl)
+    const rigobotJson = await rigoResp.json()
+    return rigobotJson
+  } catch (error) {
+    // Handle the error as needed, for example log it or return a custom error message
+    Console.error(
+      "Error logging in to Rigo, did you already accepted Rigobot?:",
+      error
+    )
+    throw new Error("Failed to log in to Rigo")
   }
-
-  const session = await storage.getItem("bc-payload")
-
-  const response = await _fetch(`${RIGOBOT_HOST}/v1/conversation/feedback/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Token ${session.rigobot.key}`,
-    },
-    body: JSON.stringify(payload),
-  })
-
-  const responseData = await response.json()
-  return responseData.feedback
 }
 
 const publish = async (config: any) => {
@@ -240,6 +228,4 @@ export default {
   getPackage,
   getLangs,
   getAllPackages,
-  getRigoFeedback,
-  getOpenAIToken,
 }

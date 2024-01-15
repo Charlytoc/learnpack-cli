@@ -69,30 +69,36 @@ export default async function (
     })
   )
   app.post(
-    "/set-openai-token",
+    "/set-rigobot-token",
     jsonBodyParser,
     withHandler(async (req: express.Request, res: express.Response) => {
       const token = req.body.token
+      // Ensure token is provided in the request body
+      if (!token) {
+        return res.status(400).json({ error: "Token is required" })
+      }
 
-      const tokenSaved = await SessionManager.setOpenAIToken(token)
-      if (tokenSaved) {
-        res.json({ status: "ok" })
-      } else {
-        res.status(400)
+      try {
+        const tokenSaved = await SessionManager.setRigoToken(token)
+        // Check if the token was saved successfully
+        if (tokenSaved) {
+          res.json({ status: "ok" })
+        } else {
+          res.status(500).json({ error: "Failed to save the token" })
+        }
+      } catch {
+        // Handle any unexpected errors during the process
+        res.status(500).json({ error: "Internal server error" })
       }
     })
   )
-
   app.get(
     "/check/rigo/status",
     withHandler(async (_: express.Request, res: express.Response) => {
       const payload = await SessionManager.getPayload()
-      const openaiToken = await SessionManager.getOpenAIToken()
 
       if (payload && payload.rigobot && payload.rigobot.key) {
         res.json({ rigoToken: payload.rigobot.key })
-      } else if (openaiToken) {
-        res.json({ openaiToken })
       } else {
         res
           .status(400)
