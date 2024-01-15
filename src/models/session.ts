@@ -15,8 +15,7 @@ export interface ISession {
   config: IConfig | null;
   currentCohort: null;
   initialize: () => Promise<boolean>;
-  getOpenAIToken: () => Promise<string | null>;
-  setOpenAIToken: (token: string) => Promise<boolean>;
+  setRigoToken: (token: string) => Promise<boolean>;
   setPayload: (value: IPayload) => Promise<boolean>;
   getPayload: () => Promise<any>;
   isActive: () => boolean;

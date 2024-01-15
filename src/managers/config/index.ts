@@ -194,10 +194,10 @@ configObj.config.editor.version = version
   else if (configObj.config && configObj.config.editor.version === null) {
     Console.debug("Config version not found, downloading default.")
     const resp = await fetch(
-      "https://raw.githubusercontent.com/learnpack/coding-ide/learnpack/package.json"
+      "https://raw.githubusercontent.com/learnpack/ide/master/package.json"
     )
     const packageJSON = await resp.json()
-    configObj.config.editor.version = packageJSON.version || "1.0.73"
+    configObj.config.editor.version = packageJSON.version || "3.0.20"
   }
 
   if (configObj.config) {
