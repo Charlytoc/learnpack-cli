@@ -32,21 +32,15 @@ const Session: ISession = {
 
     return true
   },
-  getOpenAIToken: async function () {
-    await this.initialize()
-    let token = null
-    try {
-      token = await storage.getItem("openai-token")
-    } catch {
-      Console.debug("Error retriving openai token")
-    }
 
-    return token
-  },
-  setOpenAIToken: async function (token: string) {
+  setRigoToken: async function (token: string) {
     await this.initialize()
-    await storage.setItem("openai-token", token)
-    Console.debug("OpenAI token successfuly set")
+    const payload = await storage.getItem("bc-payload")
+    await storage.setItem("bc-payload", {
+      ...payload,
+      rigobot: { key: token },
+    })
+    Console.debug("Rigobot token successfuly set")
     return true
   },
   setPayload: async function (value: IPayload) {

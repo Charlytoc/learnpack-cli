@@ -37,9 +37,20 @@ export const downloadEditor = async (
   // https://raw.githubusercontent.com/learnpack/coding-ide/master/dist/app.tar.gz
   // if(versions[version] === undefined) throw new Error(`Invalid editor version ${version}`)
 
-  if (!version) 
-throw InternalError("Missing editor version on learn.json")
-  const versionNumber = parseInt(version?.split(".")[0])
+  if (!version) {
+    const res = await fetch(
+      "https://raw.githubusercontent.com/learnpack/ide/master/package.json"
+    )
+    const json = await res.json()
+    version = json.version
+
+    if (!version)
+      throw InternalError(
+        `Coding Editor version was not found on learnpack repository, check the config.editor.version property on learn.json`
+      )
+  }
+
+  const versionNumber = parseInt(version.split(".")[0])
 
   let url = `https://github.com/learnpack/coding-ide/blob/${version}/dist`
 

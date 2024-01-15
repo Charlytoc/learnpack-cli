@@ -14,11 +14,6 @@ Create, sell or download and take learning amazing learning packages.
 - [Commands](#commands)
 <!-- tocstop -->
 
-* [learnpack](#learnpack)
-* [Usage](#usage)
-* [Commands](#commands)
-<!-- tocstop -->
-
 # Usage
 
 <!-- usage -->
@@ -28,21 +23,7 @@ $ npm install -g @learnpack/learnpack
 $ learnpack COMMAND
 running command...
 $ learnpack (-v|--version|version)
-@learnpack/learnpack/2.1.28 win32-x64 node-v18.16.0
-$ learnpack --help [COMMAND]
-USAGE
-  $ learnpack COMMAND
-...
-```
-
-<!-- usagestop -->
-
-```sh-session
-$ npm install -g @learnpack/learnpack
-$ learnpack COMMAND
-running command...
-$ learnpack (-v|--version|version)
-@learnpack/learnpack/2.1.28 darwin-arm64 node-v16.20.0
+@learnpack/learnpack/2.1.28 win32-x64 node-v20.10.0
 $ learnpack --help [COMMAND]
 USAGE
   $ learnpack COMMAND
@@ -371,6 +352,8 @@ _See code: [src\commands\test.ts](https://github.com/learnpack/learnpack-cli/blo
 
 <!-- commandsstop -->
 
+<<<<<<< HEAD
+
 - [`learnpack audit`](#learnpack-audit)
 - [`learnpack clean`](#learnpack-clean)
 - [`learnpack download [PACKAGE]`](#learnpack-download-package)
@@ -685,4 +668,6 @@ ARGUMENTS
 
 _See code: [src/commands/test.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.29/src/commands/test.ts)_
 
-<!-- commandsstop -->
+# <!-- commandsstop -->
+
+> > > > > > > 0cb3e56d84c197f9d008836bb573eade212b7e57
