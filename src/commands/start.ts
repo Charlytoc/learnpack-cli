@@ -185,13 +185,6 @@ export default class StartCommand extends SessionCommand {
           })
         })
 
-        socket.on("generate", async (data: IExerciseData) => {
-          console.log(
-            "Receving generate event, this shouldn't be happening",
-            data
-          )
-        })
-
         socket.on("test", async (data: IExerciseData) => {
           const exercise = this.configManager?.getExercise(data.exerciseSlug)
 
@@ -248,11 +241,11 @@ export default class StartCommand extends SessionCommand {
         setTimeout(() => dispatcher.enqueue(dispatcher.events.RUNNING), 1000)
 
         // start watching for file changes
-
         if (StartCommand.flags.watch)
-          this.configManager.watchIndex(_exercises =>
-            socket.reload(null, _exercises)
-          )
+          this.configManager.watchIndex(_filename => {
+            // Instead of reloading with socket.reload(), I just notify the frontend for the file change
+            socket.emit("file_change", "ready", _filename)
+          })
       }
     }
   }
