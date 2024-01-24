@@ -4,6 +4,8 @@ import { flags } from "@oclif/command"
 import SessionCommand from "../utils/SessionCommand"
 import Console from "../utils/console"
 import socket from "../managers/socket"
+import TelemetryManager from "../managers/telemetry"
+
 import queue from "../utils/fileQueue"
 import {
   decompress,
@@ -185,11 +187,9 @@ export default class StartCommand extends SessionCommand {
           })
         })
 
-        socket.on("generate", async (data: IExerciseData) => {
-          console.log(
-            "Receving generate event, this shouldn't be happening",
-            data
-          )
+        socket.on("telemetry", (data: any) => {
+          Console.info("Registering telemetry event: ", data)
+          TelemetryManager.registerEvent(data)
         })
 
         socket.on("test", async (data: IExerciseData) => {
@@ -248,11 +248,11 @@ export default class StartCommand extends SessionCommand {
         setTimeout(() => dispatcher.enqueue(dispatcher.events.RUNNING), 1000)
 
         // start watching for file changes
-
         if (StartCommand.flags.watch)
-          this.configManager.watchIndex(_exercises =>
-            socket.reload(null, _exercises)
-          )
+          this.configManager.watchIndex(_filename => {
+            // Instead of reloading with socket.reload(), I just notify the frontend for the file change
+            socket.emit("file_change", "ready", _filename)
+          })
       }
     }
   }

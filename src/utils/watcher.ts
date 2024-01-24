@@ -3,17 +3,19 @@ import Console from "./console"
 import * as debounce from "debounce"
 import { IConfigManager } from "../models/config-manager"
 
-export default (path: string, reloadSocket: () => void) =>
+export default (path: string, reloadSocket: (filename: string) => void) =>
   new Promise((resolve /* , reject */) => {
     Console.debug("PATH:", path)
     const watcher = chokidar.watch(path, {
       // TODO: This watcher is not ready yet
-      ignored: /^(?=.*(\.\w+)$)(?!.*\.md$).*$/gm,
+      // ignored: /^(?=.*(\.\w+)$)(?!.*\.md$).*$/gm,
+      ignored: /\.pyc$/,
       ignoreInitial: true,
     })
     const onChange = (eventname: string, _filename: string) => {
-      resolve(eventname /* , filename */)
-      reloadSocket()
+      // Console.info(`Event ${eventname} detected. in file: ${_filename}`)
+      resolve(_filename)
+      reloadSocket(_filename)
     }
 
     watcher.on("all", debounce(onChange, 500, true))
