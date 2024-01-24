@@ -4,6 +4,8 @@ import { flags } from "@oclif/command"
 import SessionCommand from "../utils/SessionCommand"
 import Console from "../utils/console"
 import socket from "../managers/socket"
+import TelemetryManager from "../managers/telemetry"
+
 import queue from "../utils/fileQueue"
 import {
   decompress,
@@ -183,6 +185,11 @@ export default class StartCommand extends SessionCommand {
             configuration: config,
             exercise,
           })
+        })
+
+        socket.on("telemetry", (data: any) => {
+          Console.info("Registering telemetry event: ", data)
+          TelemetryManager.registerEvent(data)
         })
 
         socket.on("test", async (data: IExerciseData) => {
