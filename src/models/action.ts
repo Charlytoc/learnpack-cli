@@ -5,6 +5,6 @@ export type TAction =
   | "ready"
   | "clean"
   | "ask"
-  | "generation";
+  | "file_change";
 
 export type ICallback = (...agrs: any[]) => any;

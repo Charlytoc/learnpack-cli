@@ -21,5 +21,6 @@ bin/learn.json
 bin/preview.png
 
 .prettierrc
+.eslintcache
 
 tsconfig.tsbuildinfo

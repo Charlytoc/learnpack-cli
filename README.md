@@ -23,7 +23,7 @@ $ npm install -g @learnpack/learnpack
 $ learnpack COMMAND
 running command...
 $ learnpack (-v|--version|version)
-@learnpack/learnpack/2.1.31 darwin-arm64 node-v16.20.0
+@learnpack/learnpack/2.1.32 darwin-arm64 node-v16.20.0
 $ learnpack --help [COMMAND]
 USAGE
   $ learnpack COMMAND
@@ -78,7 +78,7 @@ DESCRIPTION
        12. If there is a file within the exercises folder but not inside of any particular exercise's folder. (Warning)
 ```
 
-_See code: [src/commands/audit.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.31/src/commands/audit.ts)_
+_See code: [src/commands/audit.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.32/src/commands/audit.ts)_
 
 ## `learnpack clean`
 
@@ -93,7 +93,7 @@ DESCRIPTION
      Extra documentation goes here
 ```
 
-_See code: [src/commands/clean.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.31/src/commands/clean.ts)_
+_See code: [src/commands/clean.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.32/src/commands/clean.ts)_
 
 ## `learnpack download [PACKAGE]`
 
@@ -111,7 +111,7 @@ DESCRIPTION
   Extra documentation goes here
 ```
 
-_See code: [src/commands/download.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.31/src/commands/download.ts)_
+_See code: [src/commands/download.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.32/src/commands/download.ts)_
 
 ## `learnpack help [COMMAND]`
 
@@ -142,7 +142,7 @@ OPTIONS
   -h, --grading  show CLI help
 ```
 
-_See code: [src/commands/init.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.31/src/commands/init.ts)_
+_See code: [src/commands/init.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.32/src/commands/init.ts)_
 
 ## `learnpack login [PACKAGE]`
 
@@ -160,7 +160,7 @@ DESCRIPTION
      Extra documentation goes here
 ```
 
-_See code: [src/commands/login.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.31/src/commands/login.ts)_
+_See code: [src/commands/login.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.32/src/commands/login.ts)_
 
 ## `learnpack logout [PACKAGE]`
 
@@ -178,7 +178,7 @@ DESCRIPTION
      Extra documentation goes here
 ```
 
-_See code: [src/commands/logout.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.31/src/commands/logout.ts)_
+_See code: [src/commands/logout.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.32/src/commands/logout.ts)_
 
 ## `learnpack plugins`
 
@@ -313,7 +313,7 @@ DESCRIPTION
      Extra documentation goes here
 ```
 
-_See code: [src/commands/publish.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.31/src/commands/publish.ts)_
+_See code: [src/commands/publish.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.32/src/commands/publish.ts)_
 
 ## `learnpack start`
 
@@ -334,7 +334,7 @@ OPTIONS
   -w, --watch                         Watch for file changes
 ```
 
-_See code: [src/commands/start.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.31/src/commands/start.ts)_
+_See code: [src/commands/start.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.32/src/commands/start.ts)_
 
 ## `learnpack test [EXERCISESLUG]`
 
@@ -348,7 +348,7 @@ ARGUMENTS
   EXERCISESLUG  The name of the exercise to test
 ```
 
-_See code: [src/commands/test.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.31/src/commands/test.ts)_
+_See code: [src/commands/test.ts](https://github.com/learnpack/learnpack-cli/blob/v2.1.32/src/commands/test.ts)_
 
 <!-- commandsstop -->
 

@@ -386,24 +386,25 @@ fs.mkdirSync(confPath.base)
           [exercise(configObj?.config?.exercisesPath || "", 0, configObj)]
       this.save()
     },
-    watchIndex: function (onChange: () => void) {
+    watchIndex: function (onChange: (filename: string) => void) {
       if (configObj.config && !configObj.config.exercisesPath)
         throw ValidationError(
           "No exercises directory to watch: " + configObj.config.exercisesPath
         )
 
       this.buildIndex()
+
       watch(configObj?.config?.exercisesPath || "", onChange)
-        .then((/* eventname, filename */) => {
+        .then(() => {
           Console.debug("Changes detected on your exercises")
           this.buildIndex()
-          if (onChange) 
-onChange()
+          // if (onChange) onChange(filename);
         })
         .catch(error => {
           throw error
         })
     },
+
     save: () => {
       // Console.debug("Saving configuration with: ", configObj)
 
