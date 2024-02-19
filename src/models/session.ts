@@ -9,6 +9,12 @@ export interface IStartProps {
   payload: IPayload | null;
 }
 
+type TLoginResponse = {
+  token: string;
+  user_id: string;
+  email: string;
+};
+
 export interface ISession {
   sessionStarted: boolean;
   token: string | null;
@@ -21,7 +27,7 @@ export interface ISession {
   isActive: () => boolean;
   get: (config?: IConfigObj) => Promise<any>;
   login: () => Promise<void>;
-  loginWeb: (email: string, password: string) => Promise<void>;
+  loginWeb: (email: string, password: string) => Promise<TLoginResponse>;
   sync: () => Promise<void>;
   start: ({ token, payload }: IStartProps) => Promise<void>;
   destroy: () => Promise<void>;

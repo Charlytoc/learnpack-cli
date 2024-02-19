@@ -11,6 +11,7 @@ import { IConfigObj, TEntries } from "../../models/config"
 import { IConfigManager } from "../../models/config-manager"
 import { IExercise } from "../../models/exercise-obj"
 import SessionManager from "../../managers/session"
+import TelemetryManager from "../telemetry"
 
 const withHandler =
   (func: (req: express.Request, res: express.Response) => void) =>
@@ -177,10 +178,22 @@ export default async function (
       ) {
         const exercise = configManager.getExercise(req.params.slug)
         res.json(exercise)
+        if (exercise.position) {
+          TelemetryManager.registerStepEvent(
+            exercise.position,
+            "open_step",
+            {}
+          )
+        }
+
         return
       }
 
       const exercise = configManager.startExercise(req.params.slug)
+      if (exercise.position) {
+        TelemetryManager.registerStepEvent(exercise.position, "open_step", {})
+      }
+
       dispatcher.enqueue(dispatcher.events.START_EXERCISE, req.params.slug)
 
       type TEntry = "python3" | "html" | "node" | "react" | "java";

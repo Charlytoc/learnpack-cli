@@ -4,8 +4,8 @@ import { flags } from "@oclif/command"
 import SessionCommand from "../utils/SessionCommand"
 import Console from "../utils/console"
 import socket from "../managers/socket"
-import TelemetryManager from "../managers/telemetry"
-
+import TelemetryManager, { TStep } from "../managers/telemetry"
+import createServer from "../managers/server"
 import queue from "../utils/fileQueue"
 import {
   decompress,
@@ -13,8 +13,6 @@ import {
   checkIfDirectoryExists,
 } from "../managers/file"
 import { prioritizeHTMLFile } from "../utils/misc"
-
-import createServer from "../managers/server"
 
 import { IGitpodData } from "../models/gitpod-data"
 import { IExercise, IExerciseData } from "../models/exercise-obj"
@@ -118,6 +116,30 @@ export default class StartCommand extends SessionCommand {
           path: `${config.dirPath}/vscode_queue.json`,
         })
 
+        if (configObject.exercises) {
+          const agent = configObject.config?.editor.agent || ""
+          const path = configObject.config?.dirPath || ""
+
+          const steps = configObject.exercises.map(
+            (e: IExercise, index): TStep => ({
+              slug: e.slug,
+              position: e.position || index,
+              files: e.files,
+              ai_interactions: [],
+              compilations: [],
+              tests: [],
+              is_testeable: e.graded || false,
+            })
+          )
+          if (path && steps.length > 0) {
+            TelemetryManager.start(agent, steps, path)
+          }
+
+          if (config.telemetry) {
+            TelemetryManager.urls = config.telemetry
+          }
+        }
+
         socket.start(config, server, false)
 
         socket.on("open", (data: IGitpodData) => {
@@ -184,12 +206,13 @@ export default class StartCommand extends SessionCommand {
             socket,
             configuration: config,
             exercise,
+            telemetry: TelemetryManager,
           })
         })
 
-        socket.on("telemetry", (data: any) => {
-          Console.info("Registering telemetry event: ", data)
-          TelemetryManager.registerEvent(data)
+        socket.on("ai_interaction", (data: any) => {
+          const { stepPosition, event, eventData } = data
+          TelemetryManager.registerStepEvent(stepPosition, event, eventData)
         })
 
         socket.on("test", async (data: IExerciseData) => {
@@ -223,6 +246,7 @@ export default class StartCommand extends SessionCommand {
             socket,
             configuration: config,
             exercise,
+            telemetry: TelemetryManager,
           })
 
           this.configManager?.save()
@@ -232,6 +256,9 @@ export default class StartCommand extends SessionCommand {
 
         const terminate = () => {
           Console.debug("Terminating Learnpack...")
+
+          TelemetryManager.submit()
+
           server.terminate(() => {
             this.configManager?.noCurrentExercise()
             dispatcher.enqueue(dispatcher.events.END)
