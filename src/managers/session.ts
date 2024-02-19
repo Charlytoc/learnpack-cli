@@ -10,6 +10,7 @@ import * as storage from "node-persist"
 
 import { IPayload, ISession, IStartProps } from "../models/session"
 import { IConfigObj } from "../models/config"
+import TelemetryManager from "./telemetry"
 
 const Session: ISession = {
   sessionStarted: false,
@@ -109,6 +110,11 @@ const Session: ISession = {
     const data = await api.login(email, password)
     if (data) {
       this.start({ token: data.token, payload: data })
+      TelemetryManager.setStudent({
+        user_id: data.user_id,
+        email: data.email,
+        token: data.token,
+      })
       return data
     }
   },

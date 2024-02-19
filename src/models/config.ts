@@ -1,4 +1,5 @@
 import { IExercise } from "./exercise-obj"
+import { TTelemetryUrls } from "../managers/telemetry"
 
 export type TGrading = "isolated" | "incremental" | "no-grading";
 
@@ -70,6 +71,7 @@ export interface IConfig {
   bugsLink?: string;
   videoSolutions?: boolean;
   skills: Array<string>;
+  telemetry?: TTelemetryUrls;
   runHook: (...agrs: Array<any>) => void;
   testingFinishedCallback: (arg: any | undefined) => void;
 }
