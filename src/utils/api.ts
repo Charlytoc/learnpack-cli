@@ -43,7 +43,8 @@ const fetch = async (
     }
 
     if (resp.status === 401)
-      throw APIError("Invalid authentication credentials", 401)
+      Console.debug("Invalid authentication credentials", `Code: 401`)
+    // throw APIError("Invalid authentication credentials", 401)
     else if (resp.status === 404) 
 throw APIError("Package not found", 404)
     else if (resp.status >= 500)
@@ -232,6 +233,16 @@ const sendBatchTelemetry = async function (url: string, body: object) {
     return
   }
 
+  const session = await storage.getItem("bc-payload")
+  if (
+    !session ||
+    !Object.prototype.hasOwnProperty.call(session, "token") ||
+    session.token === ""
+  ) {
+    console.debug("No token found, skipping stream telemetry delivery")
+    return
+  }
+
   fetch(
     url,
     {
@@ -250,6 +261,16 @@ const sendBatchTelemetry = async function (url: string, body: object) {
 
 const sendStreamTelemetry = async function (url: string, body: object) {
   if (!url) {
+    return
+  }
+
+  const session = await storage.getItem("bc-payload")
+  if (
+    !session ||
+    !Object.prototype.hasOwnProperty.call(session, "token") ||
+    session.token === ""
+  ) {
+    console.debug("No token found, skipping stream telemetry delivery")
     return
   }
 
