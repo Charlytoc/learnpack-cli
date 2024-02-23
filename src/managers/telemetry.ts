@@ -63,6 +63,7 @@ type TStudent = {
 export interface ITelemetryJSONSchema {
   telemetry_id?: string;
   student?: TStudent;
+  slug: string;
   agent?: string;
   tutorial_started_at?: number;
   last_interaction_at?: number;
@@ -83,7 +84,12 @@ interface ITelemetryManager {
   configPath: string | null;
   urls: TTelemetryUrls;
   salute: (message: string) => void;
-  start: (agent: string, steps: TStep[], path: string) => void;
+  start: (
+    agent: string,
+    steps: TStep[],
+    path: string,
+    tutorialSlug: string
+  ) => void;
   prevStep?: number;
   registerStepEvent: (
     stepPosition: number,
@@ -109,7 +115,7 @@ const TelemetryManager: ITelemetryManager = {
     console.log(message)
   },
 
-  start: function (agent, steps, path) {
+  start: function (agent, steps, path, tutorialSlug) {
     this.configPath = path
     if (!this.current) {
       this.retrieve(agent, steps)
@@ -121,6 +127,7 @@ const TelemetryManager: ITelemetryManager = {
           } else {
             this.current = {
               telemetry_id: createUUID(),
+              slug: tutorialSlug,
               agent,
               tutorial_started_at: Date.now(),
               steps,

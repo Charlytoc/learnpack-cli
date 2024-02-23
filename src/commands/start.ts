@@ -119,7 +119,9 @@ export default class StartCommand extends SessionCommand {
         if (configObject.exercises) {
           const agent = configObject.config?.editor.agent || ""
           const path = configObject.config?.dirPath || ""
+          const tutorialSlug = configObject.config?.slug || ""
 
+          Console.info("Starting Telemetry with slug...", tutorialSlug)
           const steps = configObject.exercises.map(
             (e: IExercise, index): TStep => ({
               slug: e.slug,
@@ -132,7 +134,7 @@ export default class StartCommand extends SessionCommand {
             })
           )
           if (path && steps.length > 0) {
-            TelemetryManager.start(agent, steps, path)
+            TelemetryManager.start(agent, steps, path, tutorialSlug)
           }
 
           if (config.telemetry) {
