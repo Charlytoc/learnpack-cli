@@ -18,9 +18,13 @@ interface IOptions {
   body?: string;
 }
 
-const fetch = async (url: string, options: IOptions = {}) => {
+const fetch = async (
+  url: string,
+  options: IOptions = {},
+  returnAsJson = true
+) => {
   const headers: IHeaders = { "Content-Type": "application/json" }
-  Console.log(`Fetching ${url}`)
+  Console.debug(`Fetching ${url}`)
   let session = null
   try {
     session = await storage.getItem("bc-payload")
@@ -34,8 +38,10 @@ const fetch = async (url: string, options: IOptions = {}) => {
       headers: { ...headers, ...options.headers },
     } as any)
 
-    if (resp.status >= 200 && resp.status < 300) 
-return await resp.json()
+    if (resp.status >= 200 && resp.status < 300) {
+      return returnAsJson ? await resp.json() : await resp.text()
+    }
+
     if (resp.status === 401)
       throw APIError("Invalid authentication credentials", 401)
     else if (resp.status === 404) 
@@ -221,6 +227,48 @@ const APIError = (error: TypeError | string, code?: number) => {
   return _err
 }
 
+const sendBatchTelemetry = async function (url: string, body: object) {
+  if (!url) {
+    return
+  }
+
+  fetch(
+    url,
+    {
+      method: "POST",
+      body: JSON.stringify(body),
+    },
+    false
+  )
+    .then(response => {
+      return response.text()
+    })
+    .catch(error => {
+      Console.debug("Error while sending batch Telemetry", error)
+    })
+}
+
+const sendStreamTelemetry = async function (url: string, body: object) {
+  if (!url) {
+    return
+  }
+
+  fetch(
+    url,
+    {
+      method: "POST",
+      body: JSON.stringify(body),
+    },
+    false
+  )
+    .then(response => {
+      return response
+    })
+    .catch(error => {
+      Console.debug("Error while sending stream Telemetry", error)
+    })
+}
+
 export default {
   login,
   publish,
@@ -228,4 +276,6 @@ export default {
   getPackage,
   getLangs,
   getAllPackages,
+  sendBatchTelemetry,
+  sendStreamTelemetry,
 }
