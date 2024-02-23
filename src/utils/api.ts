@@ -239,7 +239,7 @@ const sendBatchTelemetry = async function (url: string, body: object) {
     !Object.prototype.hasOwnProperty.call(session, "token") ||
     session.token === ""
   ) {
-    console.debug("No token found, skipping stream telemetry delivery")
+    Console.debug("No token found, skipping stream telemetry delivery")
     return
   }
 
@@ -270,7 +270,7 @@ const sendStreamTelemetry = async function (url: string, body: object) {
     !Object.prototype.hasOwnProperty.call(session, "token") ||
     session.token === ""
   ) {
-    console.debug("No token found, skipping stream telemetry delivery")
+    Console.debug("No token found, skipping stream telemetry delivery")
     return
   }
 
