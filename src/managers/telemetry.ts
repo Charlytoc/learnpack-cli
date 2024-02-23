@@ -1,5 +1,5 @@
 import { IFile } from "../models/file"
-
+import API from "../utils/api"
 const fs = require("fs")
 
 function createUUID(): string {
@@ -277,23 +277,11 @@ return Promise.resolve()
     const url = this.urls.batch
     if (!url) {
       return
-      // throw new Error("Batch URL not specified");
     }
 
     const body = this.current
-    fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    })
-      .then(response => {
-        return response.text()
-      })
-      .catch(error => {
-        console.log("Error", error)
-      })
+
+    API.sendBatchTelemetry(url, body)
   },
   save: function () {
     fs.writeFile(
@@ -327,19 +315,7 @@ return
       data,
     }
 
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      })
-      const responseText = await response.text()
-    } catch (error) {
-      error
-      // Console.error(error);
-    }
+    API.sendStreamTelemetry(url, body)
   },
 }
 
