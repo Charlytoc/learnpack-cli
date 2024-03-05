@@ -62,7 +62,7 @@ type TStudent = {
 
 export interface ITelemetryJSONSchema {
   telemetry_id?: string;
-  student?: TStudent;
+  user_id?: number | string;
   slug: string;
   agent?: string;
   tutorial_started_at?: number;
@@ -147,13 +147,22 @@ const TelemetryManager: ITelemetryManager = {
         })
     }
   },
+  // verifyStudent: function () {
+  //   if (!this.current) {
+  //     return;
+  //   }
+
+  //   if (!this.current.user_id) {
+
+  //   }
+  // },
 
   setStudent: function (student) {
     if (!this.current) {
       return
     }
 
-    this.current.student = student
+    this.current.user_id = student.user_id
     this.save()
     this.submit()
   },
@@ -308,7 +317,6 @@ return
     const url = this.urls.streaming
     if (!url) {
       return
-      // throw new Error("Streaming URL not specified");
     }
 
     const stepSlug = this.current.steps[stepPosition].slug
@@ -316,7 +324,7 @@ return
     const body = {
       slug: stepSlug,
       telemetry_id: this.current.telemetry_id,
-      user_id: this.current.student?.user_id,
+      user_id: this.current.user_id,
       step_position: stepPosition,
       event,
       data,
